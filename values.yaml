@@ -7,14 +7,23 @@ image:
   tag: latest
   PullPolicy: IfNotPresent
 
-replicaCount: 1
+replicas: 1
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: event-exporter
 
 additionalRbacs:
 
 annotations:
-  prometheus.io/scrape: 'true'
-  prometheus.io/port: '2112'
-  prometheus.io/path: '/metrics'
+  # prometheus.io/scrape: 'true'
+  # prometheus.io/port: '2112'
+  # prometheus.io/path: '/metrics'
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -37,16 +46,31 @@ affinity: {}
 conf:
   logLevel: debug
   logFormat: json
-  elasticsearch:
-    hosts:
-    - "https://taco-elasticsearch-es-http.lma.svc.siim-dev:9200"
-    index: kube-events
-    user: elasticsearch_user
-    password: elasticsearch_password
-    additionalDefaultReceivers: []
-  additionalRoutes: {}
-  additionalReceivers: {}
+  recievers:
+  # chek https://github.com/resmoio/kubernetes-event-exporter#note
+  # - name: default
+  #   type: elasticsearch
+  #   config:
+  #     hosts:
+  #     - "https://taco-elasticsearch-es-http.lma.svc.siim-dev:9200"
+  #     index: kube-events
+  #     username: elasticsearch_user
+  #     password: elasticsearch_password
+  #     tls: # optional, advanced options for tls
+  #       insecureSkipVerify: true
+  - name: stdout
+    type: stdout
+    config: { }
+  # - name: loki
+  #   type: file
+  #   config:
+  #     path: "/tmp/kubernetes-event.log"
+
+clustername: taco-cluster.local
 
 addons:
-  loki:
-    any...
+  loki: 
+    enabled: false
+    # host: loki
+    # port: 3100      
+    # target_file: "/tmp/kubernetes-event.log"
