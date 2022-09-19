@@ -1,0 +1,52 @@
+# Default values for kubernetes-event-exporter.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+nameOverride: event-exporter
+image:
+  repository: ghcr.io/resmoio/kubernetes-event-exporter
+  tag: latest
+  PullPolicy: IfNotPresent
+
+replicaCount: 1
+
+additionalRbacs:
+
+annotations:
+  prometheus.io/scrape: 'true'
+  prometheus.io/port: '2112'
+  prometheus.io/path: '/metrics'
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+conf:
+  logLevel: debug
+  logFormat: json
+  elasticsearch:
+    hosts:
+    - "https://taco-elasticsearch-es-http.lma.svc.siim-dev:9200"
+    index: kube-events
+    user: elasticsearch_user
+    password: elasticsearch_password
+    additionalDefaultReceivers: []
+  additionalRoutes: {}
+  additionalReceivers: {}
+
+addons:
+  loki:
+    any...
